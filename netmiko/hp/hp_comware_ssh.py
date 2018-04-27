@@ -1,7 +1,9 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 import time
+import re
 from netmiko.cisco_base_connection import CiscoSSHConnection
+from netmiko.ssh_exception import NetMikoTimeoutException
 
 
 class HPComwareSSH(CiscoSSHConnection):
@@ -65,17 +67,52 @@ class HPComwareSSH(CiscoSSHConnection):
         self.base_prompt = prompt
         return self.base_prompt
 
-    def enable(self, cmd='system-view'):
-        """enable mode on Comware is system-view."""
-        return self.config_mode(config_command=cmd)
+    def enable(self, cmd='super level-15', pattern=r'ssword', re_flags=re.IGNORECASE):
+        """Escalate privileges."""
+        delay_factor = self.select_delay_factor(1)
+        output = ""
+        msg = "Failed to enter privilege-level 15. Please ensure you pass " \
+              "the 'secret' argument to ConnectHandler."
+        if not self.check_enable_mode():
+            self.write_channel(self.normalize_cmd(cmd))
+            i = 1
+            max_loops = 6
+            while i <= max_loops:
+                new_data = self.read_channel()
+                try:
+                    # Comware in certain contexts will prompt for a username
+                    if re.search(r'Username', new_data, flags=re.I):
+                        self.write_channel(self.username + self.RETURN)
+                        time.sleep(1 * delay_factor)
+                        output += new_data
+                        new_data = self.read_channel()
+                    # Search for password pattern / send password
+                    if re.search(pattern, new_data, flags=re.I):
+                        self.write_channel(self.secret + self.RETURN)
+                        time.sleep(1 * delay_factor)
+                        output += new_data
+                        new_data = self.read_channel()
+                    if 'Password has not been set' in new_data:
+                        raise ValueError(msg)
+                    if re.search(r'\<.+\>', new_data):
+                        output += new_data
+                        break
+                    i += 1
 
-    def exit_enable_mode(self, exit_command='return'):
-        """enable mode on Comware is system-view."""
-        return self.exit_config_mode(exit_config=exit_command)
+                except NetMikoTimeoutException:
+                    raise ValueError(msg)
 
-    def check_enable_mode(self, check_string=']'):
-        """enable mode on Comware is system-view."""
-        return self.check_config_mode(check_string=check_string)
+            # FIX - Need a way to validate that we actually went into priv 15
+            # if not self.check_enable_mode():
+            #     raise ValueError(msg)
+        return output
+
+    def exit_enable_mode(self, exit_command=''):
+        """No exit of enable mode implemted on Comware."""
+        return ""
+
+    def check_enable_mode(self, check_string=''):
+        return False
 
     def save_config(self, cmd='save force', confirm=False):
         """Save Config."""
