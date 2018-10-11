@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 import time
 from netmiko.cisco_base_connection import CiscoSSHConnection
 
-class AlaxalaOsseBase(CiscoSSHConnection):
+class AlaxalaOsBase(CiscoSSHConnection):
     def sesion_prepation(self):
         """Prepare the session after the connection has been established."""
         self._test_channel_read(pattern=r"[>#]")
@@ -21,5 +21,5 @@ class AlaxalaOsseBase(CiscoSSHConnection):
          """No terminal width command mode on OS-SE"""
          pass
 
-class AlaxalaOsseSSH(AlaxalaOsseBase):
+class AlaxalaOsSSH(AlaxalaOsBase):
     pass
