@@ -5,6 +5,7 @@ from netmiko.a10 import A10SSH
 from netmiko.accedian import AccedianSSH
 from netmiko.alcatel import AlcatelAosSSH
 from netmiko.alcatel import AlcatelSrosSSH
+from netmiko.alliedtelesis import AlliedTelesisAWPlusSSH
 from netmiko.arista import AristaSSH, AristaTelnet
 from netmiko.arista import AristaFileTransfer
 from netmiko.apresia import ApresiaAeosSSH, ApresiaAeosTelnet
@@ -77,6 +78,7 @@ CLASS_MAPPER_BASE = {
     "accedian": AccedianSSH,
     "alcatel_aos": AlcatelAosSSH,
     "alcatel_sros": AlcatelSrosSSH,
+    "alliedtelesis_awplus": AlliedTelesisAWPlusSSH,
     "apresia_aeos": ApresiaAeosSSH,
     "arista_eos": AristaSSH,
     "aruba_os": ArubaSSH,
