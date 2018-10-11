@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from netmiko.a10 import A10SSH
 from netmiko.accedian import AccedianSSH
+from netmiko.alaxala import AlaxalaOSSSH
 from netmiko.alcatel import AlcatelAosSSH
 from netmiko.alcatel import AlcatelSrosSSH
 from netmiko.arista import AristaSSH, AristaTelnet
@@ -75,6 +76,7 @@ from netmiko.vyos import VyOSSSH
 CLASS_MAPPER_BASE = {
     "a10": A10SSH,
     "accedian": AccedianSSH,
+    "alaxala_osse": AlaxalaOsseSSH,
     "alcatel_aos": AlcatelAosSSH,
     "alcatel_sros": AlcatelSrosSSH,
     "apresia_aeos": ApresiaAeosSSH,
